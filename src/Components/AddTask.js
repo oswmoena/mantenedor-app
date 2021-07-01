@@ -26,26 +26,41 @@ const useStyles = makeStyles(() =>
 	})
 )
 
-export const AddTask = ({ taskToUpdate, data, setData }) => {
+export const AddTask = ({ taskToUpdate, data, setData, handleSelectItem, setComponentSelected }) => {
 	const classes = useStyles()
 
 	const handleSubmit = (values) => {
-		console.log(`values`, values)
 		let last_id = data[data.length - 1]['id']
 		let newArr = data
 		newArr.push({
 			id: last_id + 1,
 			title: values.title,
 			description: values.description,
+			created_at: values.created_at,
+			enabled: values.enabled,
 		})
-		console.log(`newArr`, newArr)
 		setData(newArr)
-    formik.resetForm()
-    alert("Agregado con éxito")
+		formik.resetForm()
+		alert('Agregado con éxito')
+		changeComponent()
 	}
 
 	const handleUpdate = (values) => {
-		console.log(`values`, values)
+		let newArr = data
+		// eslint-disable-next-line
+		newArr.map((task) => {
+			if (task.id === taskToUpdate.id) {
+				task.title = values.title
+				task.description = values.description
+			}
+		})
+		setData(newArr)
+		changeComponent()
+	}
+
+	const changeComponent = () => {
+		handleSelectItem('listTasks')
+		setComponentSelected(2)
 	}
 
 	useEffect(() => {
@@ -53,12 +68,15 @@ export const AddTask = ({ taskToUpdate, data, setData }) => {
 			formik.setFieldValue('title', taskToUpdate.title)
 			formik.setFieldValue('description', taskToUpdate.description)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [taskToUpdate])
 
 	const formik = useFormik({
 		initialValues: {
 			title: '',
 			description: '',
+			created_at: new Date(),
+			enabled: true,
 		},
 		validationSchema: addTaskSchema,
 		onSubmit: (values) => {
@@ -123,7 +141,7 @@ export const AddTask = ({ taskToUpdate, data, setData }) => {
 						<Grid container spacing={3} justify="center">
 							<Grid item md={6} xs={12} className={classes.buttonAdd}>
 								<Button variant="contained" color="primary" type="submit">
-									{'Agregar'}
+									{taskToUpdate ? 'Actualizar' : 'Agregar'}
 								</Button>
 							</Grid>
 							<Grid item md={6} xs={12} className={classes.buttonClear}>

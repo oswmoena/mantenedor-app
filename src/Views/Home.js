@@ -50,7 +50,7 @@ export const Home = () => {
 			case 0:
 				return null
 			case 1:
-				return <AddTask taskToUpdate={taskToUpdate} data={data} setData={setData} />
+				return <AddTask taskToUpdate={taskToUpdate} data={data} setData={setData} handleSelectItem={handleSelectItem} setComponentSelected={setComponentSelected} />
 			case 2:
 				return <ListTasks data={data} setData={setData} setTaskToUpdate={setTaskToUpdate} handleSelectItem={handleSelectItem} setComponentSelected={setComponentSelected} />
 			default:
