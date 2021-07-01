@@ -1,0 +1,7 @@
+export const GET_TASKS = 'GET_TASKS'
+export const UPDATE_TASKS = 'UPDATE_TASKS'
+export const REMOVE_TASK = 'REMOVE_TASK'
+export const ADD_TASK = 'ADD_TAKS'
+export const FILL_TASKS = 'FILL_TASKS'
+export const SELECT_TASK = 'SELECT_TASK'
+export const REMOVE_SELECT_TASK = 'REMOVE_SELECT_TASK'

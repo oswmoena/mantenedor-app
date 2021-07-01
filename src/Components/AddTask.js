@@ -4,6 +4,10 @@ import { useFormik, FormikProvider, Form, ErrorMessage } from 'formik'
 
 import { addTaskSchema } from '../Validations/addTask'
 
+import { useDispatch, useSelector } from 'react-redux'
+import { addTask, updateTasks } from '../Actions/tasks'
+import { tasks, taskToUpdate, taskSelectedValidation } from '../Selectors'
+
 const useStyles = makeStyles(() =>
 	createStyles({
 		container: {
@@ -26,35 +30,37 @@ const useStyles = makeStyles(() =>
 	})
 )
 
-export const AddTask = ({ taskToUpdate, data, setData, handleSelectItem, setComponentSelected }) => {
+export const AddTask = ({ handleSelectItem, setComponentSelected }) => {
 	const classes = useStyles()
+	const dispatch = useDispatch()
+	const taskData = useSelector(tasks)
+	const taskSelected = useSelector(taskToUpdate)
+	const taskActive = useSelector(taskSelectedValidation)
 
 	const handleSubmit = (values) => {
-		let last_id = data[data.length - 1]['id']
-		let newArr = data
-		newArr.push({
+		let last_id = taskData[taskData.length - 1] ? taskData[taskData.length - 1]['id'] : 1
+		const setDataToPush = {
 			id: last_id + 1,
 			title: values.title,
 			description: values.description,
 			created_at: values.created_at,
 			enabled: values.enabled,
-		})
-		setData(newArr)
+		}
+		dispatch(addTask(setDataToPush))
 		formik.resetForm()
 		alert('Agregado con éxito')
 		changeComponent()
 	}
 
 	const handleUpdate = (values) => {
-		let newArr = data
-		// eslint-disable-next-line
-		newArr.map((task) => {
-			if (task.id === taskToUpdate.id) {
-				task.title = values.title
-				task.description = values.description
-			}
-		})
-		setData(newArr)
+		const setDataToPush = {
+			id: taskSelected.id,
+			title: values.title,
+			description: values.description,
+			created_at: taskSelected.created_at,
+			enabled: taskSelected.enabled,
+		}
+		dispatch(updateTasks(setDataToPush))
 		changeComponent()
 	}
 
@@ -64,12 +70,12 @@ export const AddTask = ({ taskToUpdate, data, setData, handleSelectItem, setComp
 	}
 
 	useEffect(() => {
-		if (taskToUpdate) {
-			formik.setFieldValue('title', taskToUpdate.title)
-			formik.setFieldValue('description', taskToUpdate.description)
+		if (taskSelected) {
+			formik.setFieldValue('title', taskSelected.title)
+			formik.setFieldValue('description', taskSelected.description)
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [taskToUpdate])
+	}, [taskSelected])
 
 	const formik = useFormik({
 		initialValues: {
@@ -80,7 +86,7 @@ export const AddTask = ({ taskToUpdate, data, setData, handleSelectItem, setComp
 		},
 		validationSchema: addTaskSchema,
 		onSubmit: (values) => {
-			taskToUpdate ? handleUpdate(values) : handleSubmit(values)
+			taskActive ? handleUpdate(values) : handleSubmit(values)
 		},
 	})
 
@@ -141,7 +147,7 @@ export const AddTask = ({ taskToUpdate, data, setData, handleSelectItem, setComp
 						<Grid container spacing={3} justify="center">
 							<Grid item md={6} xs={12} className={classes.buttonAdd}>
 								<Button variant="contained" color="primary" type="submit">
-									{taskToUpdate ? 'Actualizar' : 'Agregar'}
+									{taskActive ? 'Actualizar' : 'Agregar'}
 								</Button>
 							</Grid>
 							<Grid item md={6} xs={12} className={classes.buttonClear}>

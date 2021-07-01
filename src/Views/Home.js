@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { Grid, makeStyles, createStyles, ListItemIcon, MenuItem, MenuList, Paper, Typography, Box } from '@material-ui/core'
 
@@ -8,7 +8,8 @@ import { ListTasks } from '../Components/ListTasks'
 import { Add } from '@material-ui/icons'
 import ListIcon from '@material-ui/icons/List'
 
-import { dummy } from '../Store/dummy'
+import { useDispatch } from 'react-redux'
+import { fillTasks, removeSelectTask } from '../Actions/tasks'
 
 const useStyles = makeStyles(() =>
 	createStyles({
@@ -35,8 +36,12 @@ export const Home = () => {
 	const classes = useStyles()
 	const [componentSelected, setComponentSelected] = useState(0)
 	const [menuItem, setMenuItem] = useState(INIT_MENU)
-	const [taskToUpdate, setTaskToUpdate] = useState(null)
-	const [data, setData] = useState(dummy)
+
+	const dispatch = useDispatch()
+
+	useEffect(() => {
+		dispatch(fillTasks())
+	}, [dispatch])
 
 	const handleSelectItem = (value) => {
 		setMenuItem({
@@ -50,9 +55,9 @@ export const Home = () => {
 			case 0:
 				return null
 			case 1:
-				return <AddTask taskToUpdate={taskToUpdate} data={data} setData={setData} handleSelectItem={handleSelectItem} setComponentSelected={setComponentSelected} />
+				return <AddTask handleSelectItem={handleSelectItem} setComponentSelected={setComponentSelected} />
 			case 2:
-				return <ListTasks data={data} setData={setData} setTaskToUpdate={setTaskToUpdate} handleSelectItem={handleSelectItem} setComponentSelected={setComponentSelected} />
+				return <ListTasks handleSelectItem={handleSelectItem} setComponentSelected={setComponentSelected} />
 			default:
 				return null
 		}
@@ -67,6 +72,7 @@ export const Home = () => {
 							<MenuItem
 								className={menuItem.addTask ? classes.selectedItem : ''}
 								onClick={() => {
+									dispatch(removeSelectTask())
 									handleSelectItem('addTask')
 									setComponentSelected(1)
 								}}
